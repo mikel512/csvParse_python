@@ -28,9 +28,9 @@ class DataSetup:
         with open('TechCrunchcontinentalUSA.csv', 'r') as f:
             reader = csv.reader(f)
             for row in reader:
-                list.append(CompanyRecord(row[0], row[1], row[2], row[3],
+                result_list.append(CompanyRecord(row[0], row[1], row[2], row[3],
                                           row[4], row[5], row[6], row[7], row[8], row[9]))
-        del list[0]
+        del result_list[0]
         return result_list
 
     # returns list of Sales objects
@@ -40,9 +40,9 @@ class DataSetup:
         with open('SalesJan2009.csv', 'r') as f:
             reader = csv.reader(f)
             for row in reader:
-                list.append(Sales(row[0],row[1],row[2],row[3],row[4],row[5],
+                result_list.append(Sales(row[0],row[1],row[2],row[3],row[4],row[5],
                                   row[6],row[7],row[8],row[9],row[10], row[11]))
-        del list[0]
+        del result_list[0]
         return result_list
 
     # returns a dict of table creation scripts

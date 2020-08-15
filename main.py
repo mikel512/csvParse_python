@@ -1,10 +1,6 @@
 import models.CompanyRecord
 import mysql.connector
 from mysql.connector import errorcode
-from dateutil.parser import parse
-
-
-
 
 # creates tables if they dont already exist, then inserts rows
 def createTables():
@@ -30,7 +26,4 @@ def createTables():
 
 
 if __name__ == '__main__':
-    parseList = parseCsv()
-    createTables()
-    insertFundingRecord(parseList)
 
