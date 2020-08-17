@@ -1,29 +1,5 @@
-import models.CompanyRecord
-import mysql.connector
-from mysql.connector import errorcode
-
-# creates tables if they dont already exist, then inserts rows
-def createTables():
-    cnx = mysql.connector.connect(user='user1', password='password123',
-                            host='127.0.0.1', database='records',
-                            auth_plugin='mysql_native_password')
-    cursor = cnx.cursor()
-    tables = getTableCreation()
-    for table_name in tables:
-        table_description = tables[table_name]
-        try:
-            print("Creating table {}: ".format(table_name), end='')
-            cursor.execute(table_description)
-        except mysql.connector.Error as err:
-            if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                print("Table already exists. Exiting...")
-            else:
-                print(err.msg)
-        else:
-            print("Table successfully created.")
-    cursor.close()
-    cnx.close()
-
+import sql_access_logic as logic
 
 if __name__ == '__main__':
-
+    execute = logic.SqlAccess()
+    execute.create_tables_and_insert()

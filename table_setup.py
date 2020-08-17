@@ -2,49 +2,11 @@ import models.CompanyRecord as CompanyRecord
 import models.Sales as Sales
 import models.RealEstateTransaction as RealEstateTransaction
 import csv
+import os
 
 
 # this class holds the methods to return lists of objects of the parsed csv files
 class DataSetup:
-    def __init__(self):
-        self.tables = self.get_table_creation()
-
-    # sets list of CompanyRecord objects
-    @staticmethod
-    def parse_transactions():
-        result_list = []
-        with open('Sacramentorealestatetransactions.csv', 'r') as f:
-            reader = csv.reader(f)
-            for row in reader:
-                result_list.append(RealEstateTransaction(row[0], row[1], row[2], row[3], row[4], row[5],
-                                         row[6], row[7], row[8], row[9], row[10], row[11]))
-        del result_list[0]
-        return result_list
-
-    # sets list of CompanyRecord objects
-    @staticmethod
-    def parse_records():
-        result_list = []
-        with open('TechCrunchcontinentalUSA.csv', 'r') as f:
-            reader = csv.reader(f)
-            for row in reader:
-                result_list.append(CompanyRecord(row[0], row[1], row[2], row[3],
-                                          row[4], row[5], row[6], row[7], row[8], row[9]))
-        del result_list[0]
-        return result_list
-
-    # returns list of Sales objects
-    @staticmethod
-    def parse_sales():
-        result_list = []
-        with open('SalesJan2009.csv', 'r') as f:
-            reader = csv.reader(f)
-            for row in reader:
-                result_list.append(Sales(row[0],row[1],row[2],row[3],row[4],row[5],
-                                  row[6],row[7],row[8],row[9],row[10], row[11]))
-        del result_list[0]
-        return result_list
-
     # returns a dict of table creation scripts
     @staticmethod
     def get_table_creation():
@@ -68,10 +30,10 @@ class DataSetup:
             "  `sale_no` int(11) NOT NULL AUTO_INCREMENT,"
             "  `transaction_date` date NOT NULL,"
             "  `product` varchar(50) NOT NULL,"
-            "  `price` int(11) ,"
+            "  `price` int(20) NOT NULL,"
             "  `payment_type` varchar(30) NOT NULL,"
             "  `name` varchar(30) NOT NULL,"
-            "  `city` varchar(30) NOT NULL,"
+            "  `city` varchar(50) NOT NULL,"
             "  `state` varchar(30) NOT NULL,"
             "  `country` varchar(30) NOT NULL,"
             "  `account_created` date NOT NULL,"
@@ -79,6 +41,23 @@ class DataSetup:
             "  `latitude` int(11) ,"
             "  `longitude` int(11) ,"
             "  PRIMARY KEY (`sale_no`)"
-            ") ")
+            ") "),
+            'Sacramentorealestatetransactions': (
+            "CREATE TABLE `Sacramentorealestatetransactions` ("
+            "  `transaction_no` int(11) NOT NULL AUTO_INCREMENT,"
+            "  `street` varchar(50) NOT NULL,"
+            "  `city` varchar(30) NOT NULL,"
+            "  `state` varchar(30) NOT NULL,"
+            "  `zip` varchar(30) NOT NULL,"
+            "  `beds` int(11) ,"
+            "  `baths` int(11) ,"
+            "  `sq_feet` int(11) ,"
+            "  `type` varchar(30) NOT NULL,"
+            "  `sale_date` date NOT NULL,"
+            "  `price` int(20) ,"
+            "  `latitude` int(11) ,"
+            "  `longitude` int(11) ,"
+            "  PRIMARY KEY (`transaction_no`)"
+            ")")
         }
         return tables

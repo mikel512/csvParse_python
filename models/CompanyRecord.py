@@ -2,9 +2,10 @@ import csv
 import mysql.connector
 import dateutil.parser
 
-class CompanyRecord:
+
+class Record:
     def __init__(self, permalink, company, numEmps, category,
-               city, state, fundedDate, raisedAmt, raisedCurrency, round):
+            city, state, fundedDate, raisedAmt, raisedCurrency, round):
         self.permalink = permalink
         self.company = company
         self.numEmps = numEmps
@@ -15,5 +16,3 @@ class CompanyRecord:
         self.raisedAmt = raisedAmt
         self.raisedCurrency = raisedCurrency
         self.round = round
-
-
