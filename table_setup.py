@@ -58,6 +58,20 @@ class DataSetup:
             "  `latitude` int(11) ,"
             "  `longitude` int(11) ,"
             "  PRIMARY KEY (`transaction_no`)"
+            ")"),
+            'SacramentocrimeJanuary2006': (
+            "CREATE TABLE `SacramentocrimeJanuary2006` ("
+            "  `crime_no` int(11) NOT NULL AUTO_INCREMENT,"
+            "  `crime_date` date NOT NULL,"
+            "  `address` varchar(50) NOT NULL,"
+            "  `district` int(2) NOT NULL,"
+            "  `beat` varchar(2) NOT NULL,"
+            "  `grid` int(11) ,"
+            "  `crime_description` varchar(100) NOT NULL,"
+            "  `ucr_ncic_code` int(11) ,"
+            "  `latitude` int(11) ,"
+            "  `longitude` int(11) ,"
+            "  PRIMARY KEY (`crime_no`)"
             ")")
         }
         return tables

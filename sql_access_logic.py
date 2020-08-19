@@ -4,6 +4,7 @@ import table_setup as Setup
 import models.CompanyRecord as CompanyRecord
 import models.Sales as Sales
 import models.RealEstateTransaction as Transaction
+import models.CrimeRecord as CrimeRecord
 import os
 from dateutil.parser import parse
 from mysql.connector import errorcode
@@ -48,6 +49,11 @@ class SqlAccess:
                         data_objects.append(Transaction.RealEstateTransaction(*row[0:]))
                     del data_objects[0]
                     self.insert_transaction(data_objects)
+                elif table_name == 'SacramentocrimeJanuary2006':
+                    for row in reader:
+                        data_objects.append(CrimeRecord.CrimeRecord(*row[0:]))
+                    del data_objects[0]
+                    self.insert_crimerec(data_objects)
             except mysql.connector.Error as err:
                 if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
                     print("Table already exists. Exiting...")
@@ -96,15 +102,30 @@ class SqlAccess:
 
     def insert_transaction(self, obj_list):
         cursor = self._cnx.cursor()
-        add_record = ("INSERT INTO Sacrementorealestatetransactions"
-                      "(street, city, state, zip, state, beds, baths, sq_feet"
+        add_record = ("INSERT INTO Sacramentorealestatetransactions"
+                      "(street, city, state, zip, beds, baths, sq_feet,"
                       "type, sale_date, price, latitude, longitude)"
                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
         for obj in obj_list:
             obj.saleDate = parse(obj.saleDate)
-            data_record = (obj.tDate, obj.product, obj.price, obj.paymentType,
-                           obj.name, obj.city, obj.state, obj.country, obj.accountCreated,
-                           obj.accountCreated, obj.lastLogin, obj.latitude, obj.longitude)
+            data_record = (obj.street, obj.city, obj.state, obj.zip, obj.beds,
+                           obj.baths, obj.squareFeet, obj.type, obj.saleDate,
+                           obj.price, obj.latitude, obj.longitude)
+            cursor.execute(add_record, data_record)
+
+        self._cnx.commit()
+        cursor.close()
+
+    def insert_crimerec(self, obj_list):
+        cursor = self._cnx.cursor()
+        add_record = ("INSERT INTO SacramentocrimeJanuary2006"
+                      "(crime_date, address, district, beat, grid, crime_description,"
+                      "ucr_ncic_code, latitude, longitude)"
+                      "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        for obj in obj_list:
+            obj.crimeDate = parse(obj.crimeDate)
+            data_record = (obj.crimeDate, obj.address, obj.district, obj.beat, obj.grid,
+                           obj.crimeDescription, obj.code, obj.latitude, obj.longitude)
             cursor.execute(add_record, data_record)
 
         self._cnx.commit()
