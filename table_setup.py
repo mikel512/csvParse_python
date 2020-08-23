@@ -75,3 +75,12 @@ class DataSetup:
             ")")
         }
         return tables
+
+    def get_sba_table_creation(self):
+        tables = {'sba_entry': (
+            "CREATE TABLE `sba_entry` ("
+            "  `rec_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  PRIMARY KEY (`rec_no`)"
+            ") ")
+        }
+
