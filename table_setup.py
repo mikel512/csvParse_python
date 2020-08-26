@@ -79,8 +79,56 @@ class DataSetup:
     def get_sba_table_creation(self):
         tables = {'sba_entry': (
             "CREATE TABLE `sba_entry` ("
-            "  `rec_no` int(12) NOT NULL AUTO_INCREMENT,"
-            "  PRIMARY KEY (`rec_no`)"
+            "  `entry_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  PRIMARY KEY (`entry_no`)"
+            ") "),
+            'publisher': (
+            "CREATE TABLE `publisher` ("
+            "  `pub_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `name` varchar(50) NOT NULL,"
+            "  PRIMARY KEY (`pub_no`)"
+            ") "),
+            'contact_point': (
+            "CREATE TABLE `contact_point` ("
+            "  `contact_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `fn` varchar(50) NOT NULL,"
+            "  `has_email` varchar(50) NOT NULL,"
+            "  PRIMARY KEY (`contact_no`)"
+            ") "),
+            'entry_distribution': (
+            "CREATE TABLE `entry_distribution` ("
+            "  `dist_no` int(12) NOT NULL,"
+            "  `entry_no` int(12) NOT NULL,"
+            "  PRIMARY KEY (`dist_no`, `entry_no`)"
+            ") "),
+            'distribution': (
+            "CREATE TABLE `distribution` ("
+            "  `dist_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `media_type` varchar(50),"
+            "  `title` varchar(50),"
+            "  `description` varchar(50),"
+            "  `download_url` varchar(50),"
+            "  `access_url` varchar(50),"
+            "  PRIMARY KEY (`dist_no`)"
+            ") "),
+            'keyword': (
+            "CREATE TABLE `keyword` ("
+            "  `kw_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `name` varchar(50),"
+            "  PRIMARY KEY (`kw_no`)"
+            ") "),
+            'keyword_entry': (
+            "CREATE TABLE `keyword_entry` ("
+            "  `kw_no` int(12) NOT NULL,"
+            "  `entry_no` int(12) NOT NULL,"
+            "  PRIMARY KEY (`kw_no`, `entry_no`)"
+            ") "),
+            'theme': (
+            "CREATE TABLE `theme` ("
+            "  `theme_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `name` varchar(50),"
+            "  PRIMARY KEY (`theme_no`)"
             ") ")
         }
+        return tables
 
