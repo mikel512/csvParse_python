@@ -80,6 +80,20 @@ class DataSetup:
         tables = {'sba_entry': (
             "CREATE TABLE `sba_entry` ("
             "  `entry_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `title` varchar(50) NOT NULL,"
+            "  `description` varchar(50) NOT NULL,"
+            "  `modified` datetime NOT NULL,"
+            "  `access_level` varchar(50) NOT NULL,"
+            "  `identifier` varchar(50) NOT NULL,"
+            "  `issued` datetime,"
+            "  `landing_page` varchar(50),"
+            "  `license` varchar(50) NOT NULL,"
+            "  `publisher_no` int(12),"
+            "  `accrual_periodicity` varchar(5),"
+            "  `is_part_of` varchar(50),"
+            "  `contact_no` int(12),"
+            "  `bureau_code` varchar(30) NOT NULL,"
+            "  `program_code` varchar(30) NOT NULL,"
             "  PRIMARY KEY (`entry_no`)"
             ") "),
             'publisher': (
