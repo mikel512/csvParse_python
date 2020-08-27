@@ -128,6 +128,12 @@ class DataSetup:
             "  `theme_no` int(12) NOT NULL AUTO_INCREMENT,"
             "  `name` varchar(50),"
             "  PRIMARY KEY (`theme_no`)"
+            ") "),
+            'entry_theme': (
+            "CREATE TABLE `entry_theme` ("
+            "  `theme_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `entry_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  PRIMARY KEY (`theme_no`, `entry_no`)"
             ") ")
         }
         return tables
