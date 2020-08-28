@@ -77,7 +77,20 @@ class DataSetup:
         return tables
 
     def get_sba_table_creation(self):
-        tables = {'sba_entry': (
+        tables = {'publisher': (
+            "CREATE TABLE `publisher` ("
+            "  `pub_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `name` varchar(50) NOT NULL,"
+            "  PRIMARY KEY (`pub_no`)"
+            ") "),
+            'contact_point': (
+            "CREATE TABLE `contact_point` ("
+            "  `contact_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `fn` varchar(50) NOT NULL,"
+            "  `has_email` varchar(50) NOT NULL,"
+            "  PRIMARY KEY (`contact_no`)"
+            ") "),
+            'sba_entry': (
             "CREATE TABLE `sba_entry` ("
             "  `entry_no` int(12) NOT NULL AUTO_INCREMENT,"
             "  `title` varchar(50) NOT NULL,"
@@ -94,26 +107,23 @@ class DataSetup:
             "  `contact_no` int(12),"
             "  `bureau_code` varchar(30) NOT NULL,"
             "  `program_code` varchar(30) NOT NULL,"
-            "  PRIMARY KEY (`entry_no`)"
+            "  PRIMARY KEY (`entry_no`),"
+            "  CONSTRAINT `publisher_ibfk_1` FOREIGN KEY (`publisher_no`) "
+            "     REFERENCES `publisher` (`pub_no`) ON DELETE CASCADE,"
+            "  CONSTRAINT `contactp_ibfk_1` FOREIGN KEY (`contact_no`) "
+            "     REFERENCES `contact_point` (`contact_no`) ON DELETE CASCADE" 
             ") "),
-            'publisher': (
-            "CREATE TABLE `publisher` ("
-            "  `pub_no` int(12) NOT NULL AUTO_INCREMENT,"
-            "  `name` varchar(50) NOT NULL,"
-            "  PRIMARY KEY (`pub_no`)"
+            'keyword': (
+            "CREATE TABLE `keyword` ("
+            "  `kw_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `name` varchar(50),"
+            "  PRIMARY KEY (`kw_no`)"
             ") "),
-            'contact_point': (
-            "CREATE TABLE `contact_point` ("
-            "  `contact_no` int(12) NOT NULL AUTO_INCREMENT,"
-            "  `fn` varchar(50) NOT NULL,"
-            "  `has_email` varchar(50) NOT NULL,"
-            "  PRIMARY KEY (`contact_no`)"
-            ") "),
-            'entry_distribution': (
-            "CREATE TABLE `entry_distribution` ("
-            "  `dist_no` int(12) NOT NULL,"
-            "  `entry_no` int(12) NOT NULL,"
-            "  PRIMARY KEY (`dist_no`, `entry_no`)"
+            'theme': (
+            "CREATE TABLE `theme` ("
+            "  `theme_no` int(12) NOT NULL AUTO_INCREMENT,"
+            "  `name` varchar(50),"
+            "  PRIMARY KEY (`theme_no`)"
             ") "),
             'distribution': (
             "CREATE TABLE `distribution` ("
@@ -125,29 +135,41 @@ class DataSetup:
             "  `access_url` varchar(50),"
             "  PRIMARY KEY (`dist_no`)"
             ") "),
-            'keyword': (
-            "CREATE TABLE `keyword` ("
-            "  `kw_no` int(12) NOT NULL AUTO_INCREMENT,"
-            "  `name` varchar(50),"
-            "  PRIMARY KEY (`kw_no`)"
+            'entry_distribution': (
+            "CREATE TABLE `entry_distribution` ("
+            "  `dist_no` int(12) NOT NULL,"
+            "  `entry_no` int(12) NOT NULL,"
+            "  PRIMARY KEY (`dist_no`, `entry_no`),"
+            "  KEY `dist_no` (`dist_no`),"
+            "  KEY `entry_no` (`entry_no`),"
+            "  CONSTRAINT `entrydist_ibfk_1` FOREIGN KEY (`dist_no`) "
+            "     REFERENCES `distribution` (`dist_no`) ON DELETE CASCADE,"
+            "  CONSTRAINT `entrydist_ibfk_2` FOREIGN KEY (`entry_no`) "
+            "     REFERENCES `sba_entry` (`entry_no`) ON DELETE CASCADE"
             ") "),
             'keyword_entry': (
             "CREATE TABLE `keyword_entry` ("
             "  `kw_no` int(12) NOT NULL,"
             "  `entry_no` int(12) NOT NULL,"
-            "  PRIMARY KEY (`kw_no`, `entry_no`)"
-            ") "),
-            'theme': (
-            "CREATE TABLE `theme` ("
-            "  `theme_no` int(12) NOT NULL AUTO_INCREMENT,"
-            "  `name` varchar(50),"
-            "  PRIMARY KEY (`theme_no`)"
+            "  PRIMARY KEY (`kw_no`, `entry_no`),"
+            "  KEY `kw_no` (`kw_no`),"
+            "  KEY `sba_entry` (`entry_no`),"
+            "  CONSTRAINT `entrykw_ibfk_1` FOREIGN KEY (`kw_no`) "
+            "     REFERENCES `keyword` (`kw_no`) ON DELETE CASCADE,"
+            "  CONSTRAINT `entrykw_ibfk_2` FOREIGN KEY (`entry_no`) "
+            "     REFERENCES `sba_entry` (`entry_no`) ON DELETE CASCADE"
             ") "),
             'entry_theme': (
             "CREATE TABLE `entry_theme` ("
-            "  `theme_no` int(12) NOT NULL AUTO_INCREMENT,"
-            "  `entry_no` int(12) NOT NULL AUTO_INCREMENT,"
-            "  PRIMARY KEY (`theme_no`, `entry_no`)"
+            "  `theme_no` int(12) NOT NULL ,"
+            "  `entry_no` int(12) NOT NULL ,"
+            "  PRIMARY KEY (`theme_no`, `entry_no`), "
+            "  KEY `theme_no` (`theme_no`),"
+            "  KEY `sba_entry` (`entry_no`),"
+            "  CONSTRAINT `entrytheme_ibfk_1` FOREIGN KEY (`theme_no`) "
+            "     REFERENCES `theme` (`theme_no`) ON DELETE CASCADE,"
+            "  CONSTRAINT `entrytheme_ibfk_2` FOREIGN KEY (`entry_no`) "
+            "     REFERENCES `sba_entry` (`entry_no`) ON DELETE CASCADE"
             ") ")
         }
         return tables

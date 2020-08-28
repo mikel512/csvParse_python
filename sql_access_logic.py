@@ -5,6 +5,7 @@ import models.CompanyRecord as CompanyRecord
 import models.Sales as Sales
 import models.RealEstateTransaction as Transaction
 import models.CrimeRecord as CrimeRecord
+import models.SbaData as sba
 import os
 from dateutil.parser import parse
 from mysql.connector import errorcode
@@ -64,16 +65,95 @@ class SqlAccess:
         cursor.close()
         self._cnx.close()
 
-    # inserts rows into TechCrunchcontinentalUSA table
+    def create_sbaentry_tables(self):
+        cursor = self._cnx.cursor()
+        tables = Setup.DataSetup().get_sba_table_creation()
+        for table_name in tables:
+            table_description = tables[table_name]
+            try:
+                print("Creating table {}: ".format(table_name), end='')
+                cursor.execute(table_description)
+            except mysql.connector.Error as err:
+                if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+                    print("Table already exists. Exiting...")
+                else:
+                    print(err.msg)
+            else:
+                print("Tables successfully created.")
+
+    # inserts sba entries from a list of objects
+    # it maintains a dictionary of the primary keys of entries that
+    # might be seen again in order to avoid inserting duplicates.
+    def insert_sba_entries(self):
+        seen_dict = {}
+        sba_data = sba.SbaData()
+        data_list = sba_data.ParseJsonData()
+        cursor = self._cnx.cursor()
+
+        for entry in data_list:
+            f_keys = {}
+            if entry.publisher is not None:
+                if seen_dict.get(entry.publisher.name) is not None:
+                    f_keys['publisher'] = seen_dict[entry.publisher.name]
+                else:
+                    add_record = ("INSERT INTO publisher"
+                                  "(name) "
+                                  "VALUES (%s)")
+                    data_record = entry.publisher.name
+                    cursor.execute(add_record, data_record)
+                    # add primary key to dictionary
+                    seen_dict[entry.publisher.name] = cursor.lastrowid
+                    self._cnx.commit()
+
+            if entry.contactPoint is not None:
+                if seen_dict.get(entry.contactPoint.fn) is not None:
+                    f_keys['contact'] = seen_dict[entry.contactPoint.fn]
+                else:
+                    add_record = ("INSERT INTO contact_point"
+                                  "(fn, has_email) "
+                                  "VALUES (%s, %s)")
+                    data_record = (entry.contactPoint.fn, entry.contactPoint.email)
+                    cursor.execute(add_record, data_record)
+                    seen_dict[entry.contactPoint.fn] = cursor.lastrowid
+                    self._cnx.commit()
+
+            if entry.distributions is not None:
+                for distro in entry.distributions:
+                    if seen_dict.get(distro.title) is not None:
+                        f_keys['distros'].append(seen_dict[distro.title])
+                    else:
+                        add_record = ("INSERT INTO distribution"
+                                      "(media_type, title, description, download_url, access_url) "
+                                      "VALUES (%s, %s)")
+                        data_record = (distro.mediaType, distro.title, distro.description,
+                                       distro.downloadUrl, distro.accessUrl)
+                        cursor.execute(add_record, data_record)
+                        seen_dict[distro.title] = cursor.lastrowid
+                        self._cnx.commit()
+
+            # if is not none:
+            #     if seen_dict.get() is not none:
+            #         f_keys[] = seen_dict[]
+            #     else:
+            #         add_record = ("insert into contact_point"
+            #                       "(fn, has_email) "
+            #                       "values (%s, %s)")
+            #         data_record = (entry.contactpoint.fn, entry.contactpoint.email)
+            #         cursor.execute(add_record, data_record)
+            #         seen_dict[] = cursor.lastrowid
+            #         self._cnx.commit()
+
+
+    # inserts rows into techcrunchcontinentalusa table
     def insert_record(self, obj_list):
         cursor = self._cnx.cursor()
-        add_record = ("INSERT INTO TechCrunchcontinentalUSA" 
+        add_record = ("insert into techcrunchcontinentalusa" 
                       "(permalink, company, num_empls, category, city, state,"
                       " funded_date, raised_amount, raised_currency, round)"
-                      "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                      "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
         for obj in obj_list:
-            if obj.numEmps == '':
-                obj.numEmps = None
+            if obj.numemps == '':
+                obj.numemps = none
             date_obj = parse(obj.fundedDate)
             data_record = (obj.permalink, obj.company, obj.numEmps, obj.category, obj.city,
                            obj.state, date_obj, obj.raisedAmt, obj.raisedCurrency, obj.round)
