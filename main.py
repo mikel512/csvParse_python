@@ -3,9 +3,11 @@ import models.SbaData as data
 
 if __name__ == '__main__':
     sba_data = data.SbaData()
-    data_list = sba_data.ParseJsonData()
+    #data_list = sba_data.ParseJsonData()
     execute = logic.SqlAccess()
     execute.create_sbaentry_tables()
+    execute.insert_sba_entries()
+    #execute.create_sbaentry_tables()
 
     pass
     #execute.create_tables_and_insert()
