@@ -8,27 +8,37 @@ class SbaData:
         self.root_dir = os.path.dirname(sys.modules['__main__'].__file__)
         self.data_path = self.root_dir + '/json/' + 'sba_data.json'
 
+
+    def GetRawJson(self):
+        with open(self.data_path, encoding='utf8') as f:
+            entries_dict = json.load(f)
+        return entries_dict
     # returns array of SbaEntry objects
     def ParseJsonData(self):
         entry_list = []
-        with open(self.data_path, encoding='utf8') as f:
-            entries_dict = json.load(f)
-        for entry in entries_dict['dataset']:
-            # set ContactPoint object
-            contact = entry['contactPoint']
-            cont_obj = ContactPoint(contact['fn'], contact['hasEmail'])
-            # set list of Distribution objects
-            distr_obj = []
-            distr = entry.get('distribution')
-            if distr is not None:
-                for d in distr:
-                    distr_obj.append(Distribution(d.get('mediaType'), d.get('title'),
-                                                  d.get('description'), d.get('downloadURL'), d.get('accessURL')))
-            new_entry = SbaEntry(entry['title'], entry['description'], entry['modified'], entry['accessLevel'], entry['identifier'],
-                                 entry.get('issued'), entry.get('landingPage'), entry['license'], Publisher(entry['publisher']['name']),
-                                 entry.get('accrualPeriodicity'), entry.get('isPartOf'), cont_obj, distr_obj, entry['keyword'], entry['bureauCode'][0],
-                                 entry['programCode'][0], entry.get('language'), entry.get('theme'))
-            entry_list.append(new_entry)
+        try:
+            print('Parsing sba_data.json...')
+            with open(self.data_path, encoding='utf8') as f:
+                entries_dict = json.load(f)
+            for entry in entries_dict['dataset']:
+                # set ContactPoint object
+                contact = entry['contactPoint']
+                cont_obj = ContactPoint(contact['fn'], contact['hasEmail'])
+                # set list of Distribution objects
+                distr_obj = []
+                distr = entry.get('distribution')
+                if distr is not None:
+                    for d in distr:
+                        distr_obj.append(Distribution(d.get('mediaType'), d.get('title'),
+                                                      d.get('description'), d.get('downloadURL'), d.get('accessURL')))
+                new_entry = SbaEntry(entry['title'], entry['description'], entry['modified'], entry['accessLevel'], entry['identifier'],
+                                     entry.get('issued'), entry.get('landingPage'), entry['license'], Publisher(entry['publisher']['name']),
+                                     entry.get('accrualPeriodicity'), entry.get('isPartOf'), cont_obj, distr_obj, entry['keyword'], entry['bureauCode'][0],
+                                     entry['programCode'][0], entry.get('language'), entry.get('theme'))
+                entry_list.append(new_entry)
+            print('Parse complete')
+        except Exception as e:
+            print(e)
         return entry_list
 
 

@@ -1,12 +1,13 @@
 import mysql.connector
 import csv
-import table_setup as Setup
+from DAL import table_setup as Setup
 import models.CompanyRecord as CompanyRecord
 import models.Sales as Sales
 import models.RealEstateTransaction as Transaction
 import models.CrimeRecord as CrimeRecord
 import models.SbaData as sba
 import os
+import sys
 from dateutil.parser import parse
 from mysql.connector import errorcode
 
@@ -17,24 +18,28 @@ class SqlAccess:
         self._password = 'password123'
         self._host = '127.0.0.1'
         self._db_name = 'records'
-        self.root_dir = os.path.dirname(os.path.abspath(__file__))
+        self.root_dir = os.path.dirname(sys.modules['__main__'].__file__)
         self.createConnection()
 
     def create_tables_and_insert(self):
         cursor = self._cnx.cursor()
         tables = Setup.DataSetup().get_table_creation()
+        drop_tables = ("DROP TABLE if exists `sacramentocrimejanuary2006`, `salesjan2009`, `techcrunchcontinentalusa`, "
+                       "`sacramentorealestatetransactions`; ")
+        cursor.execute(drop_tables)
 
         # if table does not exist, create it, parse csv, then insert into table
         # if table exists, assume the csv has already been parsed and continue
         for table_name in tables:
             table_description = tables[table_name]
             try:
-                print("Creating table {}: ".format(table_name), end='')
+                print("Creating table {}: ".format(table_name))
                 cursor.execute(table_description)
                 csv_path = self.root_dir + '/data/' + table_name + '.csv'
                 reader = list(csv.reader(open(csv_path)))
                 data_objects = []
                 # get list of objects for table_name
+                print('Inserting rows into {}'.format(table_name))
                 if table_name == 'TechCrunchcontinentalUSA':
                     for row in reader:
                         data_objects.append(CompanyRecord.Record(*row[0:]))
@@ -88,15 +93,16 @@ class SqlAccess:
     # inserts sba entries from a list of objects
     # it maintains a dictionary of the primary keys of entries that
     # might be seen again in order to avoid inserting duplicates.
-    def insert_sba_entries(self):
+    def insert_sba_entries(self, data_list):
         seen_dict = {}
         seen_keywords = {}
         seen_distros = {}
-        sba_data = sba.SbaData()
-        data_list = sba_data.ParseJsonData()
         cursor = self._cnx.cursor()
+        objs_inserted = 0
+        print('Beginning insertion to database...')
 
         for entry in data_list:
+            objs_inserted += 1
             # foreign keys to be entered at the end
             f_keys = {}
             if entry.publisher is not None:
@@ -228,17 +234,7 @@ class SqlAccess:
 
             self._cnx.commit()
             f_keys.clear()
-            # if is not none:
-            #     if seen_dict.get() is not none:
-            #         f_keys[] = seen_dict[]
-            #     else:
-            #         add_record = ("insert into contact_point"
-            #                       "(fn, has_email) "
-            #                       "values (%s, %s)")
-            #         data_record = (entry.contactpoint.fn, entry.contactpoint.email)
-            #         cursor.execute(add_record, data_record)
-            #         seen_dict[] = cursor.lastrowid
-            #         self._cnx.commit()
+        print('{} objects inserted to database'.format(objs_inserted))
 
 
     # inserts rows into techcrunchcontinentalusa table
@@ -249,8 +245,8 @@ class SqlAccess:
                       " funded_date, raised_amount, raised_currency, round)"
                       "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
         for obj in obj_list:
-            if obj.numemps == '':
-                obj.numemps = None
+            if obj.numEmps == '':
+                obj.numEmps = None
             date_obj = parse(obj.fundedDate)
             data_record = (obj.permalink, obj.company, obj.numEmps, obj.category, obj.city,
                            obj.state, date_obj, obj.raisedAmt, obj.raisedCurrency, obj.round)
